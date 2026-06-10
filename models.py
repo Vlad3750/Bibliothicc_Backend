@@ -4,7 +4,7 @@ from database import Base
 class DBUser(Base):
     __tablename__ = 'user'
 
-    userID = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     password = Column(String)
     isAdmin = Column(Boolean, index=True)
@@ -20,7 +20,7 @@ class DBLibraryCollection(Base):
 
     libcolID = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    user_id = Column(Integer, ForeignKey("user.userID"))
+    user_id = Column(Integer, ForeignKey("user.id"))
     lib_id = Column(Integer, ForeignKey("library.libID"))
 
 class DBFile(Base):
