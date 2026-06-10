@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, URL
 from database import Base
+
+# nameID - PrimaryKey
+# name_ID - ForeignKey
 
 class DBUser(Base):
     __tablename__ = 'user'
@@ -23,15 +26,15 @@ class DBLibraryCollection(Base):
     user_id = Column(Integer, ForeignKey("user.userID"))
     lib_id = Column(Integer, ForeignKey("library.libID"))
 
-class DBFile(Base):
-    __tablename__ = 'file'
+class DBMedia(Base):
+    __tablename__ = 'media'
 
-    fileID = Column(Integer, primary_key=True, index=True)
+    mediaID = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     title = Column(String, index=True)
     mimeType = Column(String, index=True)
-    fileURL = Column(String)
-    coverURL = Column(String)
+    mediaURL = Column(URL)
+    coverURL = Column(URL)
     lib_ID = Column(Integer, ForeignKey("library.libID"))
 
 class DBCategory(Base):
@@ -40,9 +43,9 @@ class DBCategory(Base):
     categoryID = Column(Integer, primary_key=True, index=True)
     name = Column(Integer, index=True)
 
-class DBCategoryPerFile(Base):
-    __tablename__ = 'categoryPerFile'
+class DBCategoryPerMedia(Base):
+    __tablename__ = 'categoryPerMedia'
 
-    categoryPerFileID = Column(Integer, primary_key=True, index=True)
+    categoryPerMediaID = Column(Integer, primary_key=True, index=True)
     category_ID = Column(Integer, ForeignKey("category.categoryID"))
-    file_ID = Column(Integer, ForeignKey("file.fileID"))
+    media_ID = Column(Integer, ForeignKey("media.mediaID"))
