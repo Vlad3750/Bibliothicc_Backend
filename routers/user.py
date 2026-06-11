@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix="/user", tags=["user"])
 
 class UserCreate(BaseModel):
-    name:str = Field(..., min_length=3, max_length=25)
-    password:str = Field(..., min_length=8, max_length=25)
+    name: str = Field(..., min_length=3, max_length=25)
+    password: str = Field(..., min_length=8, max_length=25)
 
 class UserResponse(BaseModel):
     name: str
