@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 import uvicorn
 import models
+import os
 from database import engine
 from routers import user
+
+os.makedirs("data", exist_ok=True)
 
 models.Base.metadata.create_all(bind=engine)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, URL
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from database import Base
 
 # nameID - PrimaryKey
@@ -33,8 +33,8 @@ class DBMedia(Base):
     name = Column(String, index=True)
     title = Column(String, index=True)
     mimeType = Column(String, index=True)
-    mediaURL = Column(URL)
-    coverURL = Column(URL)
+    mediaURL = Column(String)
+    coverURL = Column(String)
     lib_ID = Column(Integer, ForeignKey("library.libID"))
 
 class DBCategory(Base):
