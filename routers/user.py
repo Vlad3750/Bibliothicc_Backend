@@ -27,8 +27,8 @@ class UserAPI(BaseAPI):
         return self.db.query(models.DBUser).all()
 
     @router.get("/{user_id}", response_model=UserResponse)
-    def get_user_by_id(self, id:int):
-        return self.get_or_404(self.db, models.DBUser, id)
+    def get_user_by_id(self, user_id:int):
+        return self.get_or_404(self.db, models.DBUser, user_id)
 
     @router.post("/")
     def create_user(self, user:UserCreate):
@@ -39,7 +39,7 @@ class UserAPI(BaseAPI):
         return db_user
 
     @router.delete("/{user_id}")
-    def delete_item(self, user_id: int):
+    def delete_user(self, user_id: int):
         db_user = self.get_or_404(self.db, models.DBUser, user_id)
         self.db.delete(db_user)
         self.db.commit()
