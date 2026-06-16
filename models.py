@@ -1,9 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from database import Base
 
-# nameID - PrimaryKey
-# name_ID - ForeignKey
-
 class DBUser(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, index=True)
@@ -15,7 +12,8 @@ class DBLibrary(Base):
     __tablename__ = 'library'
     libID = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    fileType = Column(String)  # Video, Movie, Text, Image, Audio
+    fileType = Column(String)
+    isPublic = Column(Boolean, default=False)  # ← NEW
 
 class DBLibraryCollection(Base):
     __tablename__ = 'libraryCollection'

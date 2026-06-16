@@ -9,7 +9,6 @@ from database import get_db
 
 router = APIRouter(tags=["upload"])
 
-
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     ext = os.path.splitext(file.filename)[1]
@@ -18,7 +17,6 @@ async def upload_file(file: UploadFile = File(...)):
     with open(path, "wb") as f:
         shutil.copyfileobj(file.file, f)
     return {"url": f"/files/{filename}"}
-
 
 @router.delete("/media/{media_id}", status_code=204)
 def delete_media_global(media_id: int, db: Session = Depends(get_db)):
