@@ -13,7 +13,8 @@ class DBLibrary(Base):
     libID = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     fileType = Column(String)
-    isPublic = Column(Boolean, default=False)  # ← NEW
+    isPublic = Column(Boolean, default=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
 class DBLibraryCollection(Base):
     __tablename__ = 'libraryCollection'
