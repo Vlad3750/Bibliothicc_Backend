@@ -1,45 +1,39 @@
-from fastapi import APIRouter
-from fastapi.params import Depends
-from fastapi_restful.cbv import cbv
-from pydantic import BaseModel, Field
-
-import models
-from database import get_db
-from routers.base import BaseAPI
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from database import get_db
+from models import DBUser
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 class UserCreate(BaseModel):
-    name: str = Field(..., min_length=3, max_length=25)
-    password: str = Field(..., min_length=8, max_length=25)
+    name: str
+    password: str
 
 class UserResponse(BaseModel):
-    name: str
     id: int
+    name: str
 
-@cbv(router)
-class UserAPI(BaseAPI):
-    db: Session = Depends(get_db)
+    class Config:
+        from_attributes = True
 
-    @router.get("/", response_model=list[UserResponse])
-    def get_all_user(self):
-        return self.db.query(models.DBUser).all()
+@router.post("/", response_model=UserResponse, status_code=201)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(DBUser).filter(DBUser.name == user.name).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="Username already taken")
+    db_user = DBUser(name=user.name, password=user.password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
-    @router.get("/{user_id}", response_model=UserResponse)
-    def get_user_by_id(self, user_id:int):
-        return self.get_or_404(self.db, models.DBUser, user_id)
-
-    @router.post("/")
-    def create_user(self, user:UserCreate):
-        db_user = models.DBUser(name=user.name, password=user.password)
-        self.db.add(db_user)
-        self.db.commit()
-        self.db.refresh(db_user)
-        return db_user
-
-    @router.delete("/{user_id}")
-    def delete_user(self, user_id: int):
-        db_user = self.get_or_404(self.db, models.DBUser, user_id)
-        self.db.delete(db_user)
-        self.db.commit()
+@router.post("/login", response_model=UserResponse)
+def login(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(DBUser).filter(
+        DBUser.name == user.name,
+        DBUser.password == user.password
+    ).first()
+    if not db_user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return db_user
