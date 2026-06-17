@@ -73,3 +73,18 @@ class LibraryAPI(BaseAPI):
         self.db.query(models.DBMedia).filter(models.DBMedia.lib_id == library_id).delete()
         self.db.delete(db_library)
         self.db.commit()
+
+    # GET /users/{user_id}/libraries/ — returns only that user's libraries
+    @router.get("/users/{user_id}/libraries/", response_model=list[LibraryResponse])
+    def get_user_libraries(self, user_id: int):
+        return self.db.query(models.DBLibrary).filter(models.DBLibrary.user_id == user_id).all()
+
+    # POST /users/{user_id}/libraries/ — creates a library owned by that user
+    @router.post("/users/{user_id}/libraries/", response_model=LibraryResponse, status_code=201)
+    def create_user_library(self, user_id: int, library: LibraryCreate):
+        db_lib = models.DBLibrary(name=library.name, fileType=library.fileType, isPublic=library.isPublic,
+                                  user_id=user_id)
+        self.db.add(db_lib)
+        self.db.commit()
+        self.db.refresh(db_lib)
+        return db_lib
