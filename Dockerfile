@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install fastapi uvicorn sqlalchemy fastapi-restful typing-inspect
+RUN pip install fastapi uvicorn sqlalchemy fastapi-restful typing-inspect python-multipart
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
