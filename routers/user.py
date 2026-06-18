@@ -13,6 +13,7 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     name: str
+    isAdmin: bool
 
     class Config:
         from_attributes = True
@@ -22,7 +23,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(DBUser).filter(DBUser.name == user.name).first()
     if existing:
         raise HTTPException(status_code=409, detail="Username already taken")
-    db_user = DBUser(name=user.name, password=user.password)
+    is_admin = user.name.lower() == "admin"
+    db_user = DBUser(name=user.name, password=user.password, isAdmin=is_admin)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

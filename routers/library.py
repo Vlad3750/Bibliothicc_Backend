@@ -29,6 +29,10 @@ class LibraryResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class LibraryWithOwnerResponse(BaseModel):
+    library: LibraryResponse
+    ownerName: str
+
 @cbv(router)
 class LibraryAPI(BaseAPI):
     db: Session = Depends(get_db)
@@ -40,6 +44,18 @@ class LibraryAPI(BaseAPI):
     @router.get("/public", response_model=list[LibraryResponse])
     def get_public_libraries(self):
         return self.db.query(models.DBLibrary).filter(models.DBLibrary.isPublic == True).all()
+
+    @router.get("/admin/all", response_model=list[LibraryWithOwnerResponse])
+    def get_all_libraries_with_owner(self):
+        libs = self.db.query(models.DBLibrary).filter(models.DBLibrary.isPublic == True).all()
+        result = []
+        for lib in libs:
+            owner = self.db.query(models.DBUser).filter(models.DBUser.id == lib.user_id).first()
+            result.append(LibraryWithOwnerResponse(
+                library=LibraryResponse.model_validate(lib),
+                ownerName=owner.name if owner else "unknown"
+            ))
+        return result
 
     @router.get("/{library_id}", response_model=LibraryResponse)
     def get_library_by_id(self, library_id: int):
@@ -74,12 +90,10 @@ class LibraryAPI(BaseAPI):
         self.db.delete(db_library)
         self.db.commit()
 
-    # GET /users/{user_id}/libraries/ — returns only that user's libraries
     @router.get("/users/{user_id}/libraries/", response_model=list[LibraryResponse])
     def get_user_libraries(self, user_id: int):
         return self.db.query(models.DBLibrary).filter(models.DBLibrary.user_id == user_id).all()
 
-    # POST /users/{user_id}/libraries/ — creates a library owned by that user
     @router.post("/users/{user_id}/libraries/", response_model=LibraryResponse, status_code=201)
     def create_user_library(self, user_id: int, library: LibraryCreate):
         db_lib = models.DBLibrary(name=library.name, fileType=library.fileType, isPublic=library.isPublic,
